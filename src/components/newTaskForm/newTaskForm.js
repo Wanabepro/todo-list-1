@@ -34,6 +34,7 @@ class NewTaskForm extends Component {
     const { inputValue } = this.state
     return (
       <input
+        autoFocus
         className="new-todo"
         placeholder="What needs to be done?"
         value={inputValue}

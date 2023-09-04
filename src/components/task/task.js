@@ -38,6 +38,10 @@ class Task extends Component {
       modifyTaskText(creationTime, inputValue)
       this.toggleEditing()
     }
+
+    if (e.key === 'Escape') {
+      this.toggleEditing()
+    }
   }
 
   toggleEditing = () => {
@@ -74,6 +78,7 @@ class Task extends Component {
           </button>
         </div>
         <input
+          autoFocus
           type="text"
           className="edit"
           value={inputValue}
