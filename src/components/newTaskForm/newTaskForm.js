@@ -8,6 +8,10 @@ class NewTaskForm extends Component {
     addTask: PropTypes.func,
   }
 
+  static defaultProps = {
+    addTask: () => {},
+  }
+
   state = {
     inputValue: '',
   }
@@ -37,10 +41,6 @@ class NewTaskForm extends Component {
         onChange={this.changeHandler}
       />
     )
-  }
-
-  static defaultProps = {
-    addTask: () => {},
   }
 }
 
