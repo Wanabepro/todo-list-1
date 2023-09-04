@@ -13,14 +13,6 @@ class Task extends Component {
     toggleCompleted: PropTypes.func,
   }
 
-  static defaultProps = {
-    text: '',
-    creationTime: new Date(),
-    completed: false,
-    deleteTask: () => {},
-    toggleCompleted: () => {},
-  }
-
   state = {
     editing: false,
     inputValue: this.props.text,
@@ -82,6 +74,14 @@ class Task extends Component {
         />
       </li>
     )
+  }
+
+  static defaultProps = {
+    text: '',
+    creationTime: new Date(),
+    completed: false,
+    deleteTask: () => {},
+    toggleCompleted: () => {},
   }
 }
 
