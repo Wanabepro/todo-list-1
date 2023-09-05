@@ -14,7 +14,6 @@
   display: none;
 }
 
-.filters li button,
 .filters li label {
   display: inline-block;
   color: inherit;
@@ -26,17 +25,14 @@
   cursor: pointer;
 }
 
-.filters li button:not(.selected),
 .filters li label:has(input[type='radio']:checked) {
   cursor: default;
 }
 
-.filters li:hover button,
 .filters li:hover label {
   border-color: rgba(175, 47, 47, 0.1);
 }
 
-.filters li button.selected,
 .filters li label:has(input[type='radio']:checked) {
   border-color: rgba(175, 47, 47, 0.2);
 }
