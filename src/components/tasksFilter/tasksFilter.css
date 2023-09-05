@@ -8,10 +8,14 @@
 
 .filters li {
   display: inline;
-  cursor: default;
 }
 
-.filters li button {
+.filters li label input[type='radio'] {
+  display: none;
+}
+
+.filters li button,
+.filters li label {
   display: inline-block;
   color: inherit;
   margin: 3px;
@@ -19,17 +23,21 @@
   text-decoration: none;
   border: 1px solid transparent;
   border-radius: 3px;
-}
-
-.filters li button:not(.selected) {
   cursor: pointer;
 }
 
-.filters li:hover button {
+.filters li button:not(.selected),
+.filters li label:has(input[type='radio']:checked) {
+  cursor: default;
+}
+
+.filters li:hover button,
+.filters li:hover label {
   border-color: rgba(175, 47, 47, 0.1);
 }
 
-.filters li button.selected {
+.filters li button.selected,
+.filters li label:has(input[type='radio']:checked) {
   border-color: rgba(175, 47, 47, 0.2);
 }
 

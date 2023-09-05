@@ -13,15 +13,11 @@
   padding: 0;
 }
 
-.todo-list li.editing .edit {
+.todo-list li .edit {
   display: block;
   width: calc(100% - 43px);
   padding: 12px 16px;
   margin: 0 0 0 43px;
-}
-
-.todo-list li.editing .view {
-  display: none;
 }
 
 .todo-list li .toggle {
@@ -117,14 +113,15 @@
   content: '✎';
 }
 
-.todo-list li .edit {
-  display: none;
-}
-
 .todo-list li.editing:last-child {
   margin-bottom: -1px;
 }
 
 .todo-list li button span {
   font-size: 0;
+}
+
+.disabled,
+.todo-list li .disabled {
+  display: none;
 }

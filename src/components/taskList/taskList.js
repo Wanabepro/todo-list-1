@@ -12,12 +12,15 @@ function TaskList({ tasks, filter, deleteTask, toggleCompleted, modifyTaskText }
         {tasks.map((task) => {
           const taskAttributes = {
             ...task,
-            key: task.creationTime.getTime(),
             deleteTask,
             toggleCompleted,
             modifyTaskText,
           }
-          return <Task {...taskAttributes} />
+          return (
+            <li key={task.creationTime.getTime()} className={task.completed ? 'completed' : ''}>
+              <Task {...taskAttributes} />
+            </li>
+          )
         })}
       </ul>
       {tasks.length === 0 && filter === 'All' && <div className="message">No tasks</div>}
@@ -33,7 +36,7 @@ TaskList.propTypes = {
       text: PropTypes.string,
       creationTime: PropTypes.instanceOf(Date),
       completed: PropTypes.bool,
-    }),
+    })
   ),
   deleteTask: PropTypes.func,
   toggleCompleted: PropTypes.func,

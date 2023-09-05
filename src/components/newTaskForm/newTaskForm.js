@@ -21,26 +21,27 @@ class NewTaskForm extends Component {
   }
 
   submitHandler = (e) => {
-    if (e.key === 'Enter') {
-      const { addTask } = this.props
-      const { inputValue } = this.state
+    e.preventDefault()
+    const { addTask } = this.props
+    const { inputValue } = this.state
 
-      addTask(inputValue)
-      this.setState({ inputValue: '' })
-    }
+    addTask(inputValue)
+    this.setState({ inputValue: '' })
   }
 
   render() {
     const { inputValue } = this.state
     return (
-      <input
-        autoFocus
-        className="new-todo"
-        placeholder="What needs to be done?"
-        value={inputValue}
-        onKeyDown={this.submitHandler}
-        onChange={this.changeHandler}
-      />
+      <form onSubmit={this.submitHandler}>
+        <input
+          required
+          autoFocus
+          className="new-todo"
+          placeholder="What needs to be done?"
+          value={inputValue}
+          onChange={this.changeHandler}
+        />
+      </form>
     )
   }
 }

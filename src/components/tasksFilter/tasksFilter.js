@@ -7,37 +7,43 @@ function TasksFilter({ filter, setFilter }) {
   return (
     <ul className="filters">
       <li>
-        <button
-          type="button"
-          className={filter === 'All' ? 'selected' : ''}
-          onClick={() => {
-            setFilter('All')
-          }}
-        >
+        <label htmlFor="all">
+          <input
+            type="radio"
+            name="filter"
+            id="all"
+            value="All"
+            checked={filter === 'All'}
+            onChange={(e) => setFilter(e.target.value)}
+          />
           All
-        </button>
+        </label>
       </li>
       <li>
-        <button
-          type="button"
-          className={filter === 'Active' ? 'selected' : ''}
-          onClick={() => {
-            setFilter('Active')
-          }}
-        >
+        <label htmlFor="active">
+          <input
+            type="radio"
+            name="filter"
+            id="active"
+            value="Active"
+            checked={filter === 'Active'}
+            onChange={(e) => setFilter(e.target.value)}
+          />
           Active
-        </button>
+        </label>
       </li>
       <li>
-        <button
-          type="button"
-          className={filter === 'Completed' ? 'selected' : ''}
-          onClick={() => {
-            setFilter('Completed')
-          }}
-        >
+        <label htmlFor="completed">
+          <input
+            type="radio"
+            name="filter"
+            id="completed"
+            value="Completed"
+            checked={filter === 'Completed'}
+            onChange={(e) => setFilter(e.target.value)}
+          />
           Completed
-        </button>
+        </label>
       </li>
     </ul>
   )

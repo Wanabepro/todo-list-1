@@ -55,8 +55,8 @@ class Task extends Component {
     const { editing, inputValue } = this.state
 
     return (
-      <li className={`${editing ? 'editing' : ''} ${completed ? 'completed' : ''}`}>
-        <div className="view">
+      <>
+        <div className={`view ${editing ? 'disabled' : ''}`}>
           <input
             id={`toggle${creationTime}`}
             className="toggle"
@@ -78,14 +78,15 @@ class Task extends Component {
           </button>
         </div>
         <input
+          required
           autoFocus
           type="text"
-          className="edit"
+          className={`edit ${editing ? '' : 'disabled'}`}
           value={inputValue}
           onChange={this.changeHandler}
           onKeyDown={this.submitHandler}
         />
-      </li>
+      </>
     )
   }
 }
