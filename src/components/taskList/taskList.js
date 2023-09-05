@@ -36,7 +36,7 @@ TaskList.propTypes = {
       text: PropTypes.string,
       creationTime: PropTypes.instanceOf(Date),
       completed: PropTypes.bool,
-    })
+    }),
   ),
   deleteTask: PropTypes.func,
   toggleCompleted: PropTypes.func,
