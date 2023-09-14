@@ -79,8 +79,19 @@ class Task extends Component {
     }))
   }
 
+  completeHandler = () => {
+    const { completed } = this.props
+    if (!completed) {
+      this.stopTimer()
+    } else {
+      this.startTimer()
+    }
+
+    this.props.toggleCompleted(this.props.creationTime)
+  }
+
   render() {
-    const { text, creationTime, completed, deleteTask, toggleCompleted } = this.props
+    const { text, creationTime, completed, deleteTask } = this.props
     const { editing, inputValue, time } = this.state
 
     return (
@@ -91,7 +102,7 @@ class Task extends Component {
             className="toggle"
             type="checkbox"
             onChange={() => {
-              toggleCompleted(creationTime)
+              this.completeHandler()
             }}
             checked={completed}
           />

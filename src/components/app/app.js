@@ -8,11 +8,7 @@ import './app.css'
 
 class App extends Component {
   state = {
-    tasks: [
-      { text: '1', creationTime: new Date(0), completed: false, initialTime: 0 },
-      { text: '2', creationTime: new Date(1), completed: true, initialTime: 0 },
-      { text: '3', creationTime: new Date(2), completed: false, initialTime: 0 },
-    ],
+    tasks: [],
     filter: 'All',
   }
 
