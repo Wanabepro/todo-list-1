@@ -13,33 +13,80 @@ class NewTaskForm extends Component {
   }
 
   state = {
-    inputValue: '',
+    text: '',
+    textWasFocused: false,
+    minutes: '',
+    seconds: '',
   }
 
   changeHandler = (e) => {
-    this.setState({ inputValue: e.target.value })
+    const { name, value } = e.target
+    if (name === 'minutes' || name === 'seconds') {
+      if (!Number.isNaN(Number(value))) {
+        this.setState({ [name]: value })
+      }
+    } else {
+      this.setState({ [name]: value })
+    }
   }
 
-  submitHandler = (e) => {
-    e.preventDefault()
-    const { addTask } = this.props
-    const { inputValue } = this.state
+  keyDownHandler = (e) => {
+    if (e.key === 'Enter') {
+      const { addTask } = this.props
+      const { text, minutes, seconds } = this.state
 
-    addTask(inputValue)
-    this.setState({ inputValue: '' })
+      if (text && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
+        addTask(text, minutes * 60 + Number(seconds))
+
+        this.setState({ text: '', textWasFocused: false, minutes: '', seconds: '' })
+      }
+    }
+  }
+
+  blurHandler = () => {
+    this.setState({ textWasFocused: true })
+  }
+
+  textIsInvalid() {
+    const { text } = this.state
+    return !text
+  }
+
+  timeIsInvalid(type) {
+    const { [type]: time } = this.state
+    return time > 59
   }
 
   render() {
-    const { inputValue } = this.state
+    const { text, textWasFocused, minutes, seconds } = this.state
     return (
-      <form onSubmit={this.submitHandler}>
+      <form className="new-todo-form">
         <input
           required
           autoFocus
-          className="new-todo"
+          name="text"
+          className={`new-todo${textWasFocused && this.textIsInvalid() ? ' invalid' : ''}`}
           placeholder="What needs to be done?"
-          value={inputValue}
+          value={text}
           onChange={this.changeHandler}
+          onKeyDown={this.keyDownHandler}
+          onBlur={this.blurHandler}
+        />
+        <input
+          name="minutes"
+          className={`new-todo-form__timer${this.timeIsInvalid('minutes') ? ' invalid' : ''}`}
+          placeholder="Min"
+          value={minutes}
+          onChange={this.changeHandler}
+          onKeyDown={this.keyDownHandler}
+        />
+        <input
+          name="seconds"
+          className={`new-todo-form__timer${this.timeIsInvalid('seconds') ? ' invalid' : ''}`}
+          placeholder="Sec"
+          value={seconds}
+          onChange={this.changeHandler}
+          onKeyDown={this.keyDownHandler}
         />
       </form>
     )

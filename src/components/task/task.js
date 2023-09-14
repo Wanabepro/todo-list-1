@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import PropTypes from 'prop-types'
 
+import convertSecondsToTimeString from '../../helpers/convertSecondsToTimeString'
 import './task.css'
 
 class Task extends Component {
@@ -9,6 +10,7 @@ class Task extends Component {
     text: PropTypes.string,
     creationTime: PropTypes.instanceOf(Date),
     completed: PropTypes.bool,
+    initialTime: PropTypes.number,
     deleteTask: PropTypes.func,
     toggleCompleted: PropTypes.func,
   }
@@ -17,6 +19,7 @@ class Task extends Component {
     text: '',
     creationTime: new Date(),
     completed: false,
+    initialTime: 0,
     deleteTask: () => {},
     toggleCompleted: () => {},
   }
@@ -24,6 +27,32 @@ class Task extends Component {
   state = {
     editing: false,
     inputValue: this.props.text,
+    time: this.props.initialTime,
+  }
+
+  timer = null
+
+  componentDidMount() {
+    this.startTimer()
+  }
+
+  componentWillUnmount() {
+    this.stopTimer()
+  }
+
+  startTimer = () => {
+    if (!this.timer) {
+      this.timer = setInterval(this.updateTimer, 1000)
+    }
+  }
+
+  updateTimer = () => {
+    this.setState(({ time: prevTime }) => ({ time: prevTime + 1 }))
+  }
+
+  stopTimer = () => {
+    clearInterval(this.timer)
+    this.timer = null
   }
 
   changeHandler = (e) => {
@@ -52,7 +81,7 @@ class Task extends Component {
 
   render() {
     const { text, creationTime, completed, deleteTask, toggleCompleted } = this.props
-    const { editing, inputValue } = this.state
+    const { editing, inputValue, time } = this.state
 
     return (
       <>
@@ -67,8 +96,17 @@ class Task extends Component {
             checked={completed}
           />
           <label htmlFor={`toggle${creationTime}`}>
-            <span className="description">{text}</span>
-            <span className="created">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
+            <span className="title">{text}</span>
+            <span className="description">
+              <button className="icon icon-play" type="button" onClick={this.startTimer}>
+                <span>play</span>
+              </button>
+              <button className="icon icon-pause" type="button" onClick={this.stopTimer}>
+                <span>pause</span>
+              </button>
+              {convertSecondsToTimeString(time)}
+            </span>
+            <span className="description">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
           </label>
           <button type="button" className="icon icon-edit" onClick={this.toggleEditing}>
             <span>edit</span>
