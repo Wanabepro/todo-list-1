@@ -5,24 +5,28 @@ import Task from '../task'
 
 import './taskList.css'
 
-function TaskList({ tasks, filter, deleteTask, toggleCompleted, modifyTaskText }) {
+// eslint-disable-next-line max-len
+function TaskList({ tasks, filter, deleteTask, toggleCompleted, modifyTaskText, changeInitialTime }) {
   return (
     <>
-      <ul className="todo-list">
-        {tasks.map((task) => {
-          const taskAttributes = {
-            ...task,
-            deleteTask,
-            toggleCompleted,
-            modifyTaskText,
-          }
-          return (
-            <li key={task.creationTime.getTime()} className={task.completed ? 'completed' : ''}>
-              <Task {...taskAttributes} />
-            </li>
-          )
-        })}
-      </ul>
+      {Boolean(tasks.length) && (
+        <ul className="todo-list">
+          {tasks.map((task) => {
+            const taskAttributes = {
+              ...task,
+              deleteTask,
+              toggleCompleted,
+              modifyTaskText,
+              changeInitialTime,
+            }
+            return (
+              <li key={task.creationTime.getTime()} className={task.completed ? 'completed' : ''}>
+                <Task {...taskAttributes} />
+              </li>
+            )
+          })}
+        </ul>
+      )}
       {tasks.length === 0 && filter === 'All' && <div className="message">No tasks</div>}
       {tasks.length === 0 && filter === 'Active' && <div className="message">No active tasks</div>}
       {tasks.length === 0 && filter === 'Completed' && <div className="message">No completed tasks</div>}
@@ -40,12 +44,16 @@ TaskList.propTypes = {
   ),
   deleteTask: PropTypes.func,
   toggleCompleted: PropTypes.func,
+  modifyTaskText: PropTypes.func,
+  changeInitialTime: PropTypes.func,
 }
 
 TaskList.defaultProps = {
   tasks: [],
   deleteTask: () => {},
   toggleCompleted: () => {},
+  modifyTaskText: () => {},
+  changeInitialTime: () => {},
 }
 
 export default TaskList

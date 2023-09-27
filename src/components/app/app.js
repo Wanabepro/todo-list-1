@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 
 import NewTaskForm from '../newTaskForm/newTaskForm'
 import TaskList from '../taskList/taskList'
@@ -6,31 +6,23 @@ import Footer from '../footer/footer'
 
 import './app.css'
 
-class App extends Component {
-  state = {
-    tasks: [],
-    filter: 'All',
+function App() {
+  const [tasks, setTasks] = useState([])
+  const [filter, setFilter] = useState('All')
+
+  const addTask = (text, initialTime) => {
+    const newTask = {
+      text,
+      creationTime: new Date(),
+      completed: false,
+      initialTime,
+    }
+
+    setTasks((tasks) => [newTask, ...tasks])
   }
 
-  filterTasks = () => {
-    const { tasks, filter } = this.state
-    if (filter === 'Active') return tasks.filter((task) => !task.completed)
-    if (filter === 'Completed') return tasks.filter((task) => task.completed)
-    return tasks
-  }
-
-  setFilter = (filterName) => {
-    this.setState(() => ({ filter: filterName }))
-  }
-
-  addTask = (text, initialTime) => {
-    this.setState(({ tasks }) => ({
-      tasks: [{ text, creationTime: new Date(), completed: false, initialTime }, ...tasks],
-    }))
-  }
-
-  modifyTaskText = (creationTime, newText) => {
-    this.setState(({ tasks }) => {
+  const modifyTaskText = (creationTime, newText) => {
+    setTasks((tasks) => {
       const targetIndex = tasks.findIndex((el) => el.creationTime === creationTime)
       const targetTask = tasks[targetIndex]
       const newTask = {
@@ -38,65 +30,76 @@ class App extends Component {
         text: newText,
       }
 
-      return {
-        tasks: [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)],
-      }
+      return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
     })
   }
 
-  deleteTask = (creationTime) => {
-    this.setState(({ tasks }) => ({
-      tasks: tasks.filter((task) => task.creationTime !== creationTime),
-    }))
+  const deleteTask = (creationTime) => {
+    setTasks((tasks) => tasks.filter((task) => task.creationTime !== creationTime))
   }
 
-  deleteAllCompleted = () => {
-    this.setState(({ tasks }) => ({ tasks: tasks.filter((task) => !task.completed) }))
+  const deleteAllCompleted = () => {
+    setTasks((tasks) => tasks.filter((task) => !task.completed))
   }
 
-  toggleCompleted = (creationTime) => {
-    this.setState(({ tasks }) => {
-      const targetIdx = tasks.findIndex((task) => task.creationTime === creationTime)
-      const targetTask = tasks[targetIdx]
-      return {
-        tasks: [
-          ...tasks.slice(0, targetIdx),
-          { ...targetTask, completed: !targetTask.completed },
-          ...tasks.slice(targetIdx + 1),
-        ],
-      }
+  const toggleCompleted = (creationTime) => {
+    setTasks((tasks) => {
+      const targetIndex = tasks.findIndex((task) => task.creationTime === creationTime)
+      const targetTask = tasks[targetIndex]
+      return [
+        ...tasks.slice(0, targetIndex),
+        { ...targetTask, completed: !targetTask.completed },
+        ...tasks.slice(targetIndex + 1),
+      ]
     })
   }
 
-  render() {
-    const { tasks, filter } = this.state
-    const uncompletedCount = tasks.length - tasks.filter((task) => task.completed).length
-    const taskListAttributes = {
-      tasks: this.filterTasks(),
-      deleteTask: this.deleteTask,
-      toggleCompleted: this.toggleCompleted,
-      modifyTaskText: this.modifyTaskText,
-      filter,
-    }
-
-    return (
-      <>
-        <header className="header">
-          <h1>todos</h1>
-          <NewTaskForm addTask={this.addTask} />
-        </header>
-        <section className="main">
-          <TaskList {...taskListAttributes} />
-          <Footer
-            uncompletedCount={uncompletedCount}
-            deleteAllCompleted={this.deleteAllCompleted}
-            filter={filter}
-            setFilter={this.setFilter}
-          />
-        </section>
-      </>
-    )
+  const changeInitialTime = (creationTime, initialTime) => {
+    setTasks((tasks) => {
+      const targetIndex = tasks.findIndex((task) => task.creationTime === creationTime)
+      if (targetIndex === -1) {
+        return tasks
+      }
+      const targetTask = tasks[targetIndex]
+      const newTask = { ...targetTask, initialTime }
+      return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
+    })
   }
+
+  const filterTasks = () => {
+    if (filter === 'Active') return tasks.filter((task) => !task.completed)
+    if (filter === 'Completed') return tasks.filter((task) => task.completed)
+    return tasks
+  }
+
+  const taskListAttributes = {
+    tasks: filterTasks(),
+    deleteTask,
+    toggleCompleted,
+    modifyTaskText,
+    filter,
+    changeInitialTime,
+  }
+
+  const uncompletedCount = 0
+
+  return (
+    <>
+      <header className="header">
+        <h1>todos</h1>
+        <NewTaskForm addTask={addTask} />
+      </header>
+      <section className="main">
+        <TaskList {...taskListAttributes} />
+        <Footer
+          uncompletedCount={uncompletedCount}
+          deleteAllCompleted={deleteAllCompleted}
+          filter={filter}
+          setFilter={setFilter}
+        />
+      </section>
+    </>
+  )
 }
 
 export default App

@@ -1,143 +1,150 @@
-import React, { Component } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import PropTypes from 'prop-types'
 
 import convertSecondsToTimeString from '../../helpers/convertSecondsToTimeString'
 import './task.css'
 
-class Task extends Component {
-  static propTypes = {
-    text: PropTypes.string,
-    creationTime: PropTypes.instanceOf(Date),
-    completed: PropTypes.bool,
-    initialTime: PropTypes.number,
-    deleteTask: PropTypes.func,
-    toggleCompleted: PropTypes.func,
+function Task({
+  text,
+  creationTime,
+  completed,
+  initialTime,
+  deleteTask,
+  toggleCompleted,
+  modifyTaskText,
+  changeInitialTime,
+}) {
+  const [editing, setEditing] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const [time, setTime] = useState(0)
+
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    if (editing === true) {
+      inputRef.current.focus()
+    }
+  }, [editing])
+
+  const timer = useRef(null)
+
+  const updateTimer = () => {
+    setTime((time) => time + 1)
   }
 
-  static defaultProps = {
-    text: '',
-    creationTime: new Date(),
-    completed: false,
-    initialTime: 0,
-    deleteTask: () => {},
-    toggleCompleted: () => {},
-  }
-
-  state = {
-    editing: false,
-    inputValue: this.props.text,
-    time: this.props.initialTime,
-  }
-
-  timer = null
-
-  componentDidMount() {
-    this.startTimer()
-  }
-
-  componentWillUnmount() {
-    this.stopTimer()
-  }
-
-  startTimer = () => {
-    if (!this.timer) {
-      this.timer = setInterval(this.updateTimer, 1000)
+  const startTimer = () => {
+    if (!timer.current) {
+      timer.current = setInterval(updateTimer, 1000)
     }
   }
 
-  updateTimer = () => {
-    this.setState(({ time: prevTime }) => ({ time: prevTime + 1 }))
+  const stopTimer = () => {
+    clearInterval(timer.current)
+    timer.current = null
   }
 
-  stopTimer = () => {
-    clearInterval(this.timer)
-    this.timer = null
+  useEffect(() => {
+    setInputValue(text)
+    startTimer()
+
+    return () => {
+      stopTimer()
+      changeInitialTime(creationTime, initialTime + time)
+    }
+  }, [])
+
+  const toggleEditing = () => {
+    setEditing((editing) => !editing)
   }
 
-  changeHandler = (e) => {
-    this.setState({ inputValue: e.target.value })
-  }
-
-  submitHandler = (e) => {
+  const submitHandler = (e) => {
     if (e.key === 'Enter') {
-      const { modifyTaskText, creationTime } = this.props
-      const { inputValue } = this.state
-
       modifyTaskText(creationTime, inputValue)
-      this.toggleEditing()
+      toggleEditing()
     }
 
     if (e.key === 'Escape') {
-      this.toggleEditing()
+      toggleEditing()
     }
   }
 
-  toggleEditing = () => {
-    this.setState(({ editing }) => ({
-      editing: !editing,
-    }))
-  }
-
-  completeHandler = () => {
-    const { completed } = this.props
+  const completeHandler = () => {
     if (!completed) {
-      this.stopTimer()
+      stopTimer()
     } else {
-      this.startTimer()
+      startTimer()
     }
 
-    this.props.toggleCompleted(this.props.creationTime)
+    toggleCompleted(creationTime)
   }
 
-  render() {
-    const { text, creationTime, completed, deleteTask } = this.props
-    const { editing, inputValue, time } = this.state
-
-    return (
-      <>
-        <div className={`view ${editing ? 'disabled' : ''}`}>
-          <input
-            id={`toggle${creationTime}`}
-            className="toggle"
-            type="checkbox"
-            onChange={() => {
-              this.completeHandler()
-            }}
-            checked={completed}
-          />
-          <label htmlFor={`toggle${creationTime}`}>
-            <span className="title">{text}</span>
-            <span className="description">
-              <button className="icon icon-play" type="button" onClick={this.startTimer}>
-                <span>play</span>
-              </button>
-              <button className="icon icon-pause" type="button" onClick={this.stopTimer}>
-                <span>pause</span>
-              </button>
-              {convertSecondsToTimeString(time)}
-            </span>
-            <span className="description">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
-          </label>
-          <button type="button" className="icon icon-edit" onClick={this.toggleEditing}>
-            <span>edit</span>
-          </button>
-          <button type="button" className="icon icon-destroy" onClick={() => deleteTask(creationTime)}>
-            <span>delete</span>
-          </button>
-        </div>
+  return (
+    <>
+      <div className={`view ${editing ? 'disabled' : ''}`}>
         <input
-          required
-          autoFocus
-          type="text"
-          className={`edit ${editing ? '' : 'disabled'}`}
-          value={inputValue}
-          onChange={this.changeHandler}
-          onKeyDown={this.submitHandler}
+          id={`toggle${creationTime}`}
+          className="toggle"
+          type="checkbox"
+          onChange={() => {
+            completeHandler()
+          }}
+          checked={completed}
         />
-      </>
-    )
-  }
+        <label htmlFor={`toggle${creationTime}`}>
+          <span className="title">{text}</span>
+          <span className="description">
+            <button className="icon icon-play" type="button" onClick={startTimer}>
+              <span>play</span>
+            </button>
+            <button className="icon icon-pause" type="button" onClick={stopTimer}>
+              <span>pause</span>
+            </button>
+            {convertSecondsToTimeString(initialTime + time)}
+          </span>
+          <span className="description">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
+        </label>
+        <button type="button" className="icon icon-edit" onClick={toggleEditing}>
+          <span>edit</span>
+        </button>
+        <button type="button" className="icon icon-destroy" onClick={() => deleteTask(creationTime)}>
+          <span>delete</span>
+        </button>
+      </div>
+      <input
+        autoFocus
+        ref={inputRef}
+        required
+        type="text"
+        className={`edit ${editing ? '' : 'disabled'}`}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={submitHandler}
+      />
+    </>
+  )
+}
+
+Task.propTypes = {
+  text: PropTypes.string,
+  creationTime: PropTypes.instanceOf(Date),
+  completed: PropTypes.bool,
+  initialTime: PropTypes.number,
+  deleteTask: PropTypes.func,
+  toggleCompleted: PropTypes.func,
+  modifyTaskText: PropTypes.func,
+  changeInitialTime: PropTypes.func,
+}
+
+Task.defaultProps = {
+  text: '',
+  creationTime: new Date(),
+  completed: false,
+  initialTime: 0,
+  deleteTask: () => {},
+  toggleCompleted: () => {},
+  modifyTaskText: () => {},
+  changeInitialTime: () => {},
 }
 
 export default Task

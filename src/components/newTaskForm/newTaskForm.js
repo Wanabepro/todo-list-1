@@ -1,96 +1,85 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import './newTaskForm.css'
 
-class NewTaskForm extends Component {
-  static propTypes = {
-    addTask: PropTypes.func,
-  }
+function NewTaskForm({ addTask }) {
+  const [text, setText] = useState('')
+  const [wasFocused, setWasFocused] = useState(false)
+  const [time, setTime] = useState({ minutes: '', seconds: '' })
 
-  static defaultProps = {
-    addTask: () => {},
-  }
-
-  state = {
-    text: '',
-    textWasFocused: false,
-    minutes: '',
-    seconds: '',
-  }
-
-  changeHandler = (e) => {
+  const changeHandler = (e) => {
     const { name, value } = e.target
     if (name === 'minutes' || name === 'seconds') {
       if (!Number.isNaN(Number(value))) {
-        this.setState({ [name]: value })
+        setTime((time) => ({ ...time, [name]: value }))
       }
     } else {
-      this.setState({ [name]: value })
+      setText(value)
     }
   }
 
-  keyDownHandler = (e) => {
+  const keyDownHandler = (e) => {
     if (e.key === 'Enter') {
-      const { addTask } = this.props
-      const { text, minutes, seconds } = this.state
+      const { minutes, seconds } = time
 
       if (text && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
         addTask(text, minutes * 60 + Number(seconds))
 
-        this.setState({ text: '', textWasFocused: false, minutes: '', seconds: '' })
+        setText('')
+        setWasFocused(false)
+        setTime({ minutes: '', seconds: '' })
       }
     }
   }
 
-  blurHandler = () => {
-    this.setState({ textWasFocused: true })
+  const blurHandler = () => {
+    setWasFocused(true)
   }
 
-  textIsInvalid() {
-    const { text } = this.state
-    return !text
+  const timeIsInvalid = (type) => {
+    const { [type]: value } = time
+    return value > 59
   }
 
-  timeIsInvalid(type) {
-    const { [type]: time } = this.state
-    return time > 59
-  }
+  return (
+    <form className="new-todo-form">
+      <input
+        required
+        name="text"
+        className={`new-todo${wasFocused && !text ? ' invalid' : ''}`}
+        placeholder="What needs to be done?"
+        value={text}
+        onChange={changeHandler}
+        onKeyDown={keyDownHandler}
+        onBlur={blurHandler}
+      />
+      <input
+        name="minutes"
+        className={`new-todo-form__timer${timeIsInvalid('minutes') ? ' invalid' : ''}`}
+        placeholder="Min"
+        value={time.minutes}
+        onChange={changeHandler}
+        onKeyDown={keyDownHandler}
+      />
+      <input
+        name="seconds"
+        className={`new-todo-form__timer${timeIsInvalid('seconds') ? ' invalid' : ''}`}
+        placeholder="Sec"
+        value={time.seconds}
+        onChange={changeHandler}
+        onKeyDown={keyDownHandler}
+      />
+    </form>
+  )
+}
 
-  render() {
-    const { text, textWasFocused, minutes, seconds } = this.state
-    return (
-      <form className="new-todo-form">
-        <input
-          required
-          autoFocus
-          name="text"
-          className={`new-todo${textWasFocused && this.textIsInvalid() ? ' invalid' : ''}`}
-          placeholder="What needs to be done?"
-          value={text}
-          onChange={this.changeHandler}
-          onKeyDown={this.keyDownHandler}
-          onBlur={this.blurHandler}
-        />
-        <input
-          name="minutes"
-          className={`new-todo-form__timer${this.timeIsInvalid('minutes') ? ' invalid' : ''}`}
-          placeholder="Min"
-          value={minutes}
-          onChange={this.changeHandler}
-          onKeyDown={this.keyDownHandler}
-        />
-        <input
-          name="seconds"
-          className={`new-todo-form__timer${this.timeIsInvalid('seconds') ? ' invalid' : ''}`}
-          placeholder="Sec"
-          value={seconds}
-          onChange={this.changeHandler}
-          onKeyDown={this.keyDownHandler}
-        />
-      </form>
-    )
-  }
+NewTaskForm.propTypes = {
+  addTask: PropTypes.func,
+}
+
+NewTaskForm.defaultProps = {
+  addTask: () => {},
 }
 
 export default NewTaskForm
