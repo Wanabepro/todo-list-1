@@ -26,6 +26,7 @@
   },
   "plugins": ["react", "prettier", "import"],
   "rules": {
+    "no-shadow": "off",
     "object-curly-newline": "off",
     "react/static-property-placement": ["error", "static public field"],
     "react/state-in-constructor": ["error", "never"],

@@ -1,49 +1,85 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import './newTaskForm.css'
 
-class NewTaskForm extends Component {
-  static propTypes = {
-    addTask: PropTypes.func,
+function NewTaskForm({ addTask }) {
+  const [text, setText] = useState('')
+  const [wasFocused, setWasFocused] = useState(false)
+  const [time, setTime] = useState({ minutes: '', seconds: '' })
+
+  const changeHandler = (e) => {
+    const { name, value } = e.target
+    if (name === 'minutes' || name === 'seconds') {
+      if (!Number.isNaN(Number(value))) {
+        setTime((time) => ({ ...time, [name]: value }))
+      }
+    } else {
+      setText(value)
+    }
   }
 
-  static defaultProps = {
-    addTask: () => {},
+  const keyDownHandler = (e) => {
+    if (e.key === 'Enter') {
+      const { minutes, seconds } = time
+
+      if (text && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
+        addTask(text, minutes * 60 + Number(seconds))
+
+        setText('')
+        setWasFocused(false)
+        setTime({ minutes: '', seconds: '' })
+      }
+    }
   }
 
-  state = {
-    inputValue: '',
+  const blurHandler = () => {
+    setWasFocused(true)
   }
 
-  changeHandler = (e) => {
-    this.setState({ inputValue: e.target.value })
+  const timeIsInvalid = (type) => {
+    const { [type]: value } = time
+    return value > 59
   }
 
-  submitHandler = (e) => {
-    e.preventDefault()
-    const { addTask } = this.props
-    const { inputValue } = this.state
+  return (
+    <form className="new-todo-form">
+      <input
+        required
+        name="text"
+        className={`new-todo${wasFocused && !text ? ' invalid' : ''}`}
+        placeholder="What needs to be done?"
+        value={text}
+        onChange={changeHandler}
+        onKeyDown={keyDownHandler}
+        onBlur={blurHandler}
+      />
+      <input
+        name="minutes"
+        className={`new-todo-form__timer${timeIsInvalid('minutes') ? ' invalid' : ''}`}
+        placeholder="Min"
+        value={time.minutes}
+        onChange={changeHandler}
+        onKeyDown={keyDownHandler}
+      />
+      <input
+        name="seconds"
+        className={`new-todo-form__timer${timeIsInvalid('seconds') ? ' invalid' : ''}`}
+        placeholder="Sec"
+        value={time.seconds}
+        onChange={changeHandler}
+        onKeyDown={keyDownHandler}
+      />
+    </form>
+  )
+}
 
-    addTask(inputValue)
-    this.setState({ inputValue: '' })
-  }
+NewTaskForm.propTypes = {
+  addTask: PropTypes.func,
+}
 
-  render() {
-    const { inputValue } = this.state
-    return (
-      <form onSubmit={this.submitHandler}>
-        <input
-          required
-          autoFocus
-          className="new-todo"
-          placeholder="What needs to be done?"
-          value={inputValue}
-          onChange={this.changeHandler}
-        />
-      </form>
-    )
-  }
+NewTaskForm.defaultProps = {
+  addTask: () => {},
 }
 
 export default NewTaskForm
