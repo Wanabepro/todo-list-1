@@ -5,16 +5,8 @@ import PropTypes from 'prop-types'
 import convertSecondsToTimeString from '../../helpers/convertSecondsToTimeString'
 import './task.css'
 
-function Task({
-  text,
-  creationTime,
-  completed,
-  initialTime,
-  deleteTask,
-  toggleCompleted,
-  modifyTaskText,
-  changeInitialTime,
-}) {
+// eslint-disable-next-line max-len
+function Task({ text, creationTime, completed, initialTime, deleteTask, toggleCompleted, modifyTaskText }) {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [time, setTime] = useState(0)
@@ -50,7 +42,6 @@ function Task({
 
     return () => {
       stopTimer()
-      changeInitialTime(creationTime, initialTime + time)
     }
   }, [])
 
@@ -133,7 +124,6 @@ Task.propTypes = {
   deleteTask: PropTypes.func,
   toggleCompleted: PropTypes.func,
   modifyTaskText: PropTypes.func,
-  changeInitialTime: PropTypes.func,
 }
 
 Task.defaultProps = {
@@ -144,7 +134,6 @@ Task.defaultProps = {
   deleteTask: () => {},
   toggleCompleted: () => {},
   modifyTaskText: () => {},
-  changeInitialTime: () => {},
 }
 
 export default Task

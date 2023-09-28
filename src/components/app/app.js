@@ -54,18 +54,6 @@ function App() {
     })
   }
 
-  const changeInitialTime = (creationTime, initialTime) => {
-    setTasks((tasks) => {
-      const targetIndex = tasks.findIndex((task) => task.creationTime === creationTime)
-      if (targetIndex === -1) {
-        return tasks
-      }
-      const targetTask = tasks[targetIndex]
-      const newTask = { ...targetTask, initialTime }
-      return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
-    })
-  }
-
   const filterTasks = () => {
     if (filter === 'Active') return tasks.filter((task) => !task.completed)
     if (filter === 'Completed') return tasks.filter((task) => task.completed)
@@ -78,10 +66,9 @@ function App() {
     toggleCompleted,
     modifyTaskText,
     filter,
-    changeInitialTime,
   }
 
-  const uncompletedCount = 0
+  const uncompletedCount = tasks.filter((task) => !task.completed).length
 
   return (
     <>

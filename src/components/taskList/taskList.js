@@ -45,7 +45,6 @@ TaskList.propTypes = {
   deleteTask: PropTypes.func,
   toggleCompleted: PropTypes.func,
   modifyTaskText: PropTypes.func,
-  changeInitialTime: PropTypes.func,
 }
 
 TaskList.defaultProps = {
@@ -53,7 +52,6 @@ TaskList.defaultProps = {
   deleteTask: () => {},
   toggleCompleted: () => {},
   modifyTaskText: () => {},
-  changeInitialTime: () => {},
 }
 
 export default TaskList
