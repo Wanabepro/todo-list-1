@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
 
 import './newTaskForm.css'
 
@@ -72,14 +71,6 @@ function NewTaskForm({ addTask }) {
       />
     </form>
   )
-}
-
-NewTaskForm.propTypes = {
-  addTask: PropTypes.func,
-}
-
-NewTaskForm.defaultProps = {
-  addTask: () => {},
 }
 
 export default NewTaskForm

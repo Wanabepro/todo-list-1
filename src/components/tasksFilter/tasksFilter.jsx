@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import './tasksFilter.css'
 
@@ -47,16 +46,6 @@ function TasksFilter({ filter, setFilter }) {
       </li>
     </ul>
   )
-}
-
-TasksFilter.propTypes = {
-  filter: PropTypes.oneOf(['All', 'Active', 'Completed']),
-  setFilter: PropTypes.func,
-}
-
-TasksFilter.defaultProps = {
-  filter: 'All',
-  setFilter: () => {},
 }
 
 export default TasksFilter

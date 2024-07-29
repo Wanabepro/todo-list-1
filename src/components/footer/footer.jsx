@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import TasksFilter from '../tasksFilter'
 
@@ -15,20 +14,6 @@ function Footer({ uncompletedCount, deleteAllCompleted, filter, setFilter }) {
       </button>
     </footer>
   )
-}
-
-Footer.propTypes = {
-  uncompletedCount: PropTypes.number,
-  deleteAllCompleted: PropTypes.func,
-  filter: PropTypes.oneOf(['All', 'Active', 'Completed']),
-  setFilter: PropTypes.func,
-}
-
-Footer.defaultProps = {
-  uncompletedCount: 0,
-  deleteAllCompleted: () => {},
-  filter: 'All',
-  setFilter: () => {},
 }
 
 export default Footer

@@ -1,15 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
-import PropTypes from 'prop-types'
 
 import convertSecondsToTimeString from '../../helpers/convertSecondsToTimeString'
 import './task.css'
 
-// eslint-disable-next-line max-len
-function Task({ text, creationTime, completed, initialTime, deleteTask, toggleCompleted, modifyTaskText }) {
+function Task({
+  text,
+  creationTime,
+  pausedTimerValue,
+  currentTime,
+  completed,
+  isActive,
+  deleteTask,
+  toggleCompleted,
+  modifyTaskText,
+  modifyTaskCreationTime,
+  modifyTaskPausedTimerValue,
+  modifyTaskActivity,
+}) {
   const [editing, setEditing] = useState(false)
-  const [inputValue, setInputValue] = useState('')
-  const [time, setTime] = useState(0)
+  const [inputValue, setInputValue] = useState(text)
 
   const inputRef = useRef(null)
 
@@ -18,32 +28,6 @@ function Task({ text, creationTime, completed, initialTime, deleteTask, toggleCo
       inputRef.current.focus()
     }
   }, [editing])
-
-  const timer = useRef(null)
-
-  const updateTimer = () => {
-    setTime((time) => time + 1)
-  }
-
-  const startTimer = () => {
-    if (!timer.current) {
-      timer.current = setInterval(updateTimer, 1000)
-    }
-  }
-
-  const stopTimer = () => {
-    clearInterval(timer.current)
-    timer.current = null
-  }
-
-  useEffect(() => {
-    setInputValue(text)
-    startTimer()
-
-    return () => {
-      stopTimer()
-    }
-  }, [])
 
   const toggleEditing = () => {
     setEditing((editing) => !editing)
@@ -60,21 +44,31 @@ function Task({ text, creationTime, completed, initialTime, deleteTask, toggleCo
     }
   }
 
+  const startTimer = () => {
+    modifyTaskActivity(creationTime, true)
+    modifyTaskCreationTime(creationTime, new Date(currentTime - pausedTimerValue))
+  }
+
+  const stopTimer = () => {
+    modifyTaskActivity(creationTime, false)
+    modifyTaskPausedTimerValue(creationTime, new Date(currentTime - creationTime))
+  }
+
   const completeHandler = () => {
+    toggleCompleted(creationTime)
+
     if (!completed) {
-      stopTimer()
+      if (isActive) stopTimer()
     } else {
       startTimer()
     }
-
-    toggleCompleted(creationTime)
   }
 
   return (
     <>
       <div className={`view ${editing ? 'disabled' : ''}`}>
         <input
-          id={`toggle${creationTime}`}
+          id={`toggle${creationTime.getTime()}`}
           className="toggle"
           type="checkbox"
           onChange={() => {
@@ -82,23 +76,39 @@ function Task({ text, creationTime, completed, initialTime, deleteTask, toggleCo
           }}
           checked={completed}
         />
-        <label htmlFor={`toggle${creationTime}`}>
+        <label htmlFor={`toggle${creationTime.getTime()}`}>
           <span className="title">{text}</span>
           <span className="description">
-            <button className="icon icon-play" type="button" onClick={startTimer}>
+            <button
+              className="icon icon-play"
+              type="button"
+              disabled={isActive || completed}
+              onClick={startTimer}
+            >
               <span>play</span>
             </button>
-            <button className="icon icon-pause" type="button" onClick={stopTimer}>
+            <button
+              className="icon icon-pause"
+              type="button"
+              disabled={!isActive || completed}
+              onClick={stopTimer}
+            >
               <span>pause</span>
             </button>
-            {convertSecondsToTimeString(initialTime + time)}
+            {isActive
+              ? convertSecondsToTimeString(currentTime - creationTime)
+              : convertSecondsToTimeString(pausedTimerValue)}
           </span>
           <span className="description">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
         </label>
         <button type="button" className="icon icon-edit" onClick={toggleEditing}>
           <span>edit</span>
         </button>
-        <button type="button" className="icon icon-destroy" onClick={() => deleteTask(creationTime)}>
+        <button
+          type="button"
+          className="icon icon-destroy"
+          onClick={() => deleteTask(creationTime)}
+        >
           <span>delete</span>
         </button>
       </div>
@@ -114,26 +124,6 @@ function Task({ text, creationTime, completed, initialTime, deleteTask, toggleCo
       />
     </>
   )
-}
-
-Task.propTypes = {
-  text: PropTypes.string,
-  creationTime: PropTypes.instanceOf(Date),
-  completed: PropTypes.bool,
-  initialTime: PropTypes.number,
-  deleteTask: PropTypes.func,
-  toggleCompleted: PropTypes.func,
-  modifyTaskText: PropTypes.func,
-}
-
-Task.defaultProps = {
-  text: '',
-  creationTime: new Date(),
-  completed: false,
-  initialTime: 0,
-  deleteTask: () => {},
-  toggleCompleted: () => {},
-  modifyTaskText: () => {},
 }
 
 export default Task
