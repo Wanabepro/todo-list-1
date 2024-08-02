@@ -15,9 +15,8 @@ function TaskList({
   deleteTask,
   toggleCompleted,
   modifyTaskText,
-  setTaskTimerStartingPoint,
-  modifyTaskPausedTimerValue,
-  modifyTaskActivity,
+  startTimer,
+  stopTimer,
 }) {
   const currentTime = useTimer()
 
@@ -35,9 +34,8 @@ function TaskList({
           deleteTask,
           toggleCompleted,
           modifyTaskText,
-          setTaskTimerStartingPoint,
-          modifyTaskPausedTimerValue,
-          modifyTaskActivity,
+          startTimer,
+          stopTimer,
           currentTime,
         }
 

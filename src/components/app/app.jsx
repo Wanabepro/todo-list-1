@@ -14,9 +14,8 @@ function App() {
     toggleCompleted,
     deleteAllCompleted,
     modifyTaskText,
-    setTaskTimerStartingPoint,
-    modifyTaskActivity,
-    modifyTaskPausedTimerValue,
+    startTimer,
+    stopTimer,
   } = useTaskList()
 
   const { filter, setFilter, filterTasks, uncompletedCount } = useTaskFiltration(tasks)
@@ -33,9 +32,8 @@ function App() {
           deleteTask={deleteTask}
           toggleCompleted={toggleCompleted}
           modifyTaskText={modifyTaskText}
-          setTaskTimerStartingPoint={setTaskTimerStartingPoint}
-          modifyTaskPausedTimerValue={modifyTaskPausedTimerValue}
-          modifyTaskActivity={modifyTaskActivity}
+          startTimer={startTimer}
+          stopTimer={stopTimer}
           filter={filter}
         />
         <Footer

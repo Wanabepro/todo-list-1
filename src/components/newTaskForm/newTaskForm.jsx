@@ -1,14 +1,15 @@
 import React, { useState } from "react"
 
 import "./newTaskForm.css"
+import calculateTargetTime from "../../helpers/calcuclateTargetTime"
 
 function NewTaskForm({ addTask }) {
   const [text, setText] = useState("")
-  const [wasFocused, setWasFocused] = useState(false)
   const [time, setTime] = useState({ minutes: "", seconds: "" })
 
   const changeHandler = (e) => {
     const { name, value } = e.target
+
     if (name === "minutes" || name === "seconds") {
       if (!Number.isNaN(Number(value))) {
         setTime((time) => ({ ...time, [name]: value }))
@@ -23,17 +24,18 @@ function NewTaskForm({ addTask }) {
       const { minutes, seconds } = time
 
       if (text && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
-        addTask(text, minutes * 60 + Number(seconds))
+        addTask(text, calculateTargetTime(minutes, seconds))
 
         setText("")
-        setWasFocused(false)
         setTime({ minutes: "", seconds: "" })
       }
     }
-  }
 
-  const blurHandler = () => {
-    setWasFocused(true)
+    if (e.key === "Escape") {
+      setText("")
+      setTime({ minutes: "", seconds: "" })
+      e.target.blur()
+    }
   }
 
   const timeIsInvalid = (type) => {
@@ -46,12 +48,11 @@ function NewTaskForm({ addTask }) {
       <input
         required
         name="text"
-        className={`new-todo${wasFocused && !text ? " invalid" : ""}`}
+        className="new-todo"
         placeholder="What needs to be done?"
         value={text}
         onChange={changeHandler}
         onKeyDown={keyDownHandler}
-        onBlur={blurHandler}
       />
       <input
         name="minutes"

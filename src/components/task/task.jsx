@@ -9,15 +9,15 @@ function Task({
   creationTime,
   timerStartingPoint,
   pausedTimerValue,
+  targetTime,
   currentTime,
   completed,
   isActive,
   deleteTask,
   toggleCompleted,
   modifyTaskText,
-  setTaskTimerStartingPoint,
-  modifyTaskPausedTimerValue,
-  modifyTaskActivity,
+  startTimer,
+  stopTimer,
 }) {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState(text)
@@ -25,10 +25,26 @@ function Task({
   const inputRef = useRef(null)
 
   useEffect(() => {
-    if (editing === true) {
+    if (editing) {
       inputRef.current.focus()
     }
   }, [editing])
+
+  useEffect(() => {
+    if (isActive && targetTime && targetTime - currentTime < 0) {
+      stopTimer(creationTime, currentTime)
+    }
+  }, [isActive, targetTime, creationTime, currentTime])
+
+  let displayedTimerValue
+
+  if (!isActive) {
+    displayedTimerValue = convertSecondsToTimeString(pausedTimerValue)
+  } else if (targetTime) {
+    displayedTimerValue = convertSecondsToTimeString(targetTime - currentTime)
+  } else {
+    displayedTimerValue = convertSecondsToTimeString(currentTime - timerStartingPoint)
+  }
 
   const toggleEditing = () => {
     setEditing((editing) => !editing)
@@ -45,23 +61,13 @@ function Task({
     }
   }
 
-  const startTimer = () => {
-    modifyTaskActivity(creationTime, true)
-    setTaskTimerStartingPoint(creationTime, new Date(currentTime - pausedTimerValue))
-  }
-
-  const stopTimer = () => {
-    modifyTaskActivity(creationTime, false)
-    modifyTaskPausedTimerValue(creationTime, new Date(currentTime - timerStartingPoint))
-  }
-
   const completeHandler = () => {
     toggleCompleted(creationTime)
 
     if (!completed) {
-      if (isActive) stopTimer()
+      if (isActive) stopTimer(creationTime, currentTime)
     } else {
-      startTimer()
+      startTimer(creationTime, currentTime)
     }
   }
 
@@ -84,7 +90,7 @@ function Task({
               className="icon icon-play"
               type="button"
               disabled={isActive || completed}
-              onClick={startTimer}
+              onClick={() => startTimer(creationTime, currentTime)}
             >
               <span>play</span>
             </button>
@@ -92,13 +98,11 @@ function Task({
               className="icon icon-pause"
               type="button"
               disabled={!isActive || completed}
-              onClick={stopTimer}
+              onClick={() => stopTimer(creationTime, currentTime)}
             >
               <span>pause</span>
             </button>
-            {isActive
-              ? convertSecondsToTimeString(currentTime - timerStartingPoint)
-              : convertSecondsToTimeString(pausedTimerValue)}
+            {displayedTimerValue}
           </span>
           <span className="description">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
         </label>
