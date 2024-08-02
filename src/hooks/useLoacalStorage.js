@@ -33,6 +33,8 @@ const useLocalStorage = (tasks, setTasks) => {
         }))
 
         localStorage.setItem("tasks", JSON.stringify(preparedTasks))
+      } else {
+        localStorage.removeItem("tasks")
       }
 
       return tasks

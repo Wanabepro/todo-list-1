@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react"
-
+import useTimer from "../../hooks/useTimer"
 import Task from "../task"
 
 import "./taskList.css"
@@ -20,15 +19,7 @@ function TaskList({
   modifyTaskPausedTimerValue,
   modifyTaskActivity,
 }) {
-  const [currentTime, setCurrentTime] = useState(new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
+  const currentTime = useTimer()
 
   const taskListEmpty = !tasks.length
 
