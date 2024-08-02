@@ -1,11 +1,11 @@
-import React, { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
+import React, { StrictMode } from "react"
+import ReactDOM from "react-dom/client"
 
-import App from './components/app'
+import App from "./components/app"
 
-import './index.css'
+import "./index.css"
 
-const root = ReactDOM.createRoot(document.querySelector('.todoapp'))
+const root = ReactDOM.createRoot(document.querySelector(".todoapp"))
 root.render(
   <StrictMode>
     <App />

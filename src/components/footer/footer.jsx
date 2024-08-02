@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react"
 
-import TasksFilter from '../tasksFilter'
+import TasksFilter from "../tasksFilter"
 
-import './footer.css'
+import "./footer.css"
 
 function Footer({ uncompletedCount, deleteAllCompleted, filter, setFilter }) {
   return (

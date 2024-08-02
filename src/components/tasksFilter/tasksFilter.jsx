@@ -1,6 +1,6 @@
-import React from 'react'
+import React from "react"
 
-import './tasksFilter.css'
+import "./tasksFilter.css"
 
 function TasksFilter({ filter, setFilter }) {
   return (
@@ -12,7 +12,7 @@ function TasksFilter({ filter, setFilter }) {
             name="filter"
             id="all"
             value="All"
-            checked={filter === 'All'}
+            checked={filter === "All"}
             onChange={(e) => setFilter(e.target.value)}
           />
           All
@@ -25,7 +25,7 @@ function TasksFilter({ filter, setFilter }) {
             name="filter"
             id="active"
             value="Active"
-            checked={filter === 'Active'}
+            checked={filter === "Active"}
             onChange={(e) => setFilter(e.target.value)}
           />
           Active
@@ -38,7 +38,7 @@ function TasksFilter({ filter, setFilter }) {
             name="filter"
             id="completed"
             value="Completed"
-            checked={filter === 'Completed'}
+            checked={filter === "Completed"}
             onChange={(e) => setFilter(e.target.value)}
           />
           Completed

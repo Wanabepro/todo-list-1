@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react"
 
-import Task from '../task'
+import Task from "../task"
 
-import './taskList.css'
+import "./taskList.css"
 
 const emptyTasksMessages = {
-  All: 'No tasks',
-  Active: 'No active tasks',
-  Completed: 'No completed tasks',
+  All: "No tasks",
+  Active: "No active tasks",
+  Completed: "No completed tasks",
 }
 
 function TaskList({
@@ -16,7 +16,7 @@ function TaskList({
   deleteTask,
   toggleCompleted,
   modifyTaskText,
-  modifyTaskCreationTime,
+  setTaskTimerStartingPoint,
   modifyTaskPausedTimerValue,
   modifyTaskActivity,
 }) {
@@ -44,14 +44,14 @@ function TaskList({
           deleteTask,
           toggleCompleted,
           modifyTaskText,
-          modifyTaskCreationTime,
+          setTaskTimerStartingPoint,
           modifyTaskPausedTimerValue,
           modifyTaskActivity,
           currentTime,
         }
 
         return (
-          <li key={task.creationTime.getTime()} className={task.completed ? 'completed' : ''}>
+          <li key={task.creationTime.getTime()} className={task.completed ? "completed" : ""}>
             <Task {...taskAttributes} />
           </li>
         )

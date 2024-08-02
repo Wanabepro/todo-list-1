@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { formatDistanceToNow } from 'date-fns'
+import React, { useEffect, useRef, useState } from "react"
+import { formatDistanceToNow } from "date-fns"
 
-import convertSecondsToTimeString from '../../helpers/convertSecondsToTimeString'
-import './task.css'
+import convertSecondsToTimeString from "../../helpers/convertSecondsToTimeString"
+import "./task.css"
 
 function Task({
   text,
   creationTime,
+  timerStartingPoint,
   pausedTimerValue,
   currentTime,
   completed,
@@ -14,7 +15,7 @@ function Task({
   deleteTask,
   toggleCompleted,
   modifyTaskText,
-  modifyTaskCreationTime,
+  setTaskTimerStartingPoint,
   modifyTaskPausedTimerValue,
   modifyTaskActivity,
 }) {
@@ -34,24 +35,24 @@ function Task({
   }
 
   const submitHandler = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       modifyTaskText(creationTime, inputValue)
       toggleEditing()
     }
 
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       toggleEditing()
     }
   }
 
   const startTimer = () => {
     modifyTaskActivity(creationTime, true)
-    modifyTaskCreationTime(creationTime, new Date(currentTime - pausedTimerValue))
+    setTaskTimerStartingPoint(creationTime, new Date(currentTime - pausedTimerValue))
   }
 
   const stopTimer = () => {
     modifyTaskActivity(creationTime, false)
-    modifyTaskPausedTimerValue(creationTime, new Date(currentTime - creationTime))
+    modifyTaskPausedTimerValue(creationTime, new Date(currentTime - timerStartingPoint))
   }
 
   const completeHandler = () => {
@@ -66,7 +67,7 @@ function Task({
 
   return (
     <>
-      <div className={`view ${editing ? 'disabled' : ''}`}>
+      <div className={`view ${editing ? "disabled" : ""}`}>
         <input
           id={`toggle${creationTime.getTime()}`}
           className="toggle"
@@ -96,7 +97,7 @@ function Task({
               <span>pause</span>
             </button>
             {isActive
-              ? convertSecondsToTimeString(currentTime - creationTime)
+              ? convertSecondsToTimeString(currentTime - timerStartingPoint)
               : convertSecondsToTimeString(pausedTimerValue)}
           </span>
           <span className="description">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
@@ -117,7 +118,7 @@ function Task({
         ref={inputRef}
         required
         type="text"
-        className={`edit ${editing ? '' : 'disabled'}`}
+        className={`edit ${editing ? "" : "disabled"}`}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={submitHandler}

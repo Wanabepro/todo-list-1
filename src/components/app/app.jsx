@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState } from "react"
 
-import useLocalStorage from '../../hooks/useLoacalStorage'
-import NewTaskForm from '../newTaskForm/newTaskForm'
-import TaskList from '../taskList/taskList'
-import Footer from '../footer/footer'
+import useLocalStorage from "../../hooks/useLoacalStorage"
+import NewTaskForm from "../newTaskForm/newTaskForm"
+import TaskList from "../taskList/taskList"
+import Footer from "../footer/footer"
 
-import './app.css'
+import "./app.css"
 
 const filters = {
   Active: (tasks) => tasks.filter((task) => !task.completed),
@@ -15,7 +15,7 @@ const filters = {
 
 function App() {
   const [tasks, setTasks] = useState([])
-  const [filter, setFilter] = useState('All')
+  const [filter, setFilter] = useState("All")
 
   useLocalStorage(tasks, setTasks)
 
@@ -23,6 +23,7 @@ function App() {
     const newTask = {
       text,
       creationTime: new Date(),
+      timerStartingPoint: new Date(),
       pausedTimerValue: new Date(0),
       completed: false,
       isActive: true,
@@ -64,13 +65,13 @@ function App() {
     })
   }
 
-  const modifyTaskCreationTime = (creationTime, newCreationTime) => {
+  const setTaskTimerStartingPoint = (creationTime, newStartingPoint) => {
     setTasks((tasks) => {
       const targetIndex = tasks.findIndex((el) => el.creationTime === creationTime)
       const targetTask = tasks[targetIndex]
       const newTask = {
         ...targetTask,
-        creationTime: newCreationTime,
+        timerStartingPoint: newStartingPoint,
       }
 
       return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
@@ -119,7 +120,7 @@ function App() {
           deleteTask={deleteTask}
           toggleCompleted={toggleCompleted}
           modifyTaskText={modifyTaskText}
-          modifyTaskCreationTime={modifyTaskCreationTime}
+          setTaskTimerStartingPoint={setTaskTimerStartingPoint}
           modifyTaskPausedTimerValue={modifyTaskPausedTimerValue}
           modifyTaskActivity={modifyTaskActivity}
           filter={filter}

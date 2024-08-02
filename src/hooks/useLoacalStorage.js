@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react"
 
 const useLocalStorage = (tasks, setTasks) => {
@@ -14,6 +15,7 @@ const useLocalStorage = (tasks, setTasks) => {
       const preparedTasks = tasksFromLocalStorage.map((task) => ({
         ...task,
         creationTime: new Date(task.creationTime),
+        timerStartingPoint: new Date(task.timerStartingPoint),
         pausedTimerValue: new Date(task.pausedTimerValue),
       }))
 
@@ -26,6 +28,7 @@ const useLocalStorage = (tasks, setTasks) => {
         const preparedTasks = tasks.map((task) => ({
           ...task,
           creationTime: task.creationTime.getTime(),
+          timerStartingPoint: task.timerStartingPoint.getTime(),
           pausedTimerValue: task.pausedTimerValue.getTime(),
         }))
 
@@ -41,7 +44,6 @@ const useLocalStorage = (tasks, setTasks) => {
       window.removeEventListener("beforeunload", saveData)
       saveData()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }
 

@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState } from "react"
 
-import './newTaskForm.css'
+import "./newTaskForm.css"
 
 function NewTaskForm({ addTask }) {
-  const [text, setText] = useState('')
+  const [text, setText] = useState("")
   const [wasFocused, setWasFocused] = useState(false)
-  const [time, setTime] = useState({ minutes: '', seconds: '' })
+  const [time, setTime] = useState({ minutes: "", seconds: "" })
 
   const changeHandler = (e) => {
     const { name, value } = e.target
-    if (name === 'minutes' || name === 'seconds') {
+    if (name === "minutes" || name === "seconds") {
       if (!Number.isNaN(Number(value))) {
         setTime((time) => ({ ...time, [name]: value }))
       }
@@ -19,15 +19,15 @@ function NewTaskForm({ addTask }) {
   }
 
   const keyDownHandler = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       const { minutes, seconds } = time
 
       if (text && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
         addTask(text, minutes * 60 + Number(seconds))
 
-        setText('')
+        setText("")
         setWasFocused(false)
-        setTime({ minutes: '', seconds: '' })
+        setTime({ minutes: "", seconds: "" })
       }
     }
   }
@@ -46,7 +46,7 @@ function NewTaskForm({ addTask }) {
       <input
         required
         name="text"
-        className={`new-todo${wasFocused && !text ? ' invalid' : ''}`}
+        className={`new-todo${wasFocused && !text ? " invalid" : ""}`}
         placeholder="What needs to be done?"
         value={text}
         onChange={changeHandler}
@@ -55,7 +55,7 @@ function NewTaskForm({ addTask }) {
       />
       <input
         name="minutes"
-        className={`new-todo-form__timer${timeIsInvalid('minutes') ? ' invalid' : ''}`}
+        className={`new-todo-form__timer${timeIsInvalid("minutes") ? " invalid" : ""}`}
         placeholder="Min"
         value={time.minutes}
         onChange={changeHandler}
@@ -63,7 +63,7 @@ function NewTaskForm({ addTask }) {
       />
       <input
         name="seconds"
-        className={`new-todo-form__timer${timeIsInvalid('seconds') ? ' invalid' : ''}`}
+        className={`new-todo-form__timer${timeIsInvalid("seconds") ? " invalid" : ""}`}
         placeholder="Sec"
         value={time.seconds}
         onChange={changeHandler}
