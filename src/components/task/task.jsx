@@ -49,19 +49,19 @@ function Task({
   } else {
     displayedTimerValue = convertSecondsToTimeString(currentTime - timerStartingPoint)
   }
+  const isCountdownActive =
+    targetTime && pausedTimerValue.getTime() < 1000 && targetTime - currentTime < 1000
 
-  const toggleEditing = () => {
-    setEditing((editing) => !editing)
-  }
-
+  const isStartButtonDisabled = isActive || completed || isCountdownActive
+  const isPauseButtonDisabled = !isActive || completed || isCountdownActive
   const submitHandler = (e) => {
     if (e.key === "Enter") {
       modifyTaskText(creationTime, inputValue)
-      toggleEditing()
+      setEditing(false)
     }
 
     if (e.key === "Escape") {
-      toggleEditing()
+      setEditing(false)
     }
   }
 
@@ -107,12 +107,7 @@ function Task({
           <button
             className="icon icon-play"
             type="button"
-            disabled={
-              isActive ||
-              completed ||
-              (targetTime &&
-                !(pausedTimerValue.getTime() >= 1000 || targetTime - currentTime >= 1000))
-            }
+            disabled={isStartButtonDisabled}
             onClick={() => startTimer(creationTime, currentTime)}
           >
             <span>play</span>
@@ -120,12 +115,7 @@ function Task({
           <button
             className="icon icon-pause"
             type="button"
-            disabled={
-              !isActive ||
-              completed ||
-              (targetTime &&
-                !(pausedTimerValue.getTime() >= 1000 || targetTime - currentTime >= 1000))
-            }
+            disabled={isPauseButtonDisabled}
             onClick={() => stopTimer(creationTime, currentTime)}
           >
             <span>pause</span>
@@ -134,7 +124,7 @@ function Task({
         </span>
         <span className="description">{`created ${formatDistanceToNow(creationTime)} ago`}</span>
       </label>
-      <button type="button" className="icon icon-edit" onClick={toggleEditing}>
+      <button type="button" className="icon icon-edit" onClick={() => setEditing(true)}>
         <span>edit</span>
       </button>
       <button type="button" className="icon icon-destroy" onClick={() => deleteTask(creationTime)}>
