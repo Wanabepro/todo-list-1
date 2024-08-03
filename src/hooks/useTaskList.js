@@ -55,10 +55,10 @@ const useTaskList = () => {
       const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
       const newTask = modifyTaskContent(targetTask, { isActive: true })
 
-      if (targetTask.targetTime) {
-        newTask.targetTime = new Date(currentTime + newTask.pausedTimerValue)
-      } else {
+      if (!targetTask.targetTime) {
         newTask.timerStartingPoint = new Date(currentTime - newTask.pausedTimerValue)
+      } else if (targetTask.pausedTimerValue.getTime() >= 1000) {
+        newTask.targetTime = new Date(currentTime.getTime() + newTask.pausedTimerValue.getTime())
       }
 
       return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
@@ -70,11 +70,11 @@ const useTaskList = () => {
       const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
       const newTask = modifyTaskContent(targetTask, { isActive: false })
 
-      if (targetTask.targetTime) {
-        const pausedTimerValueMs = newTask.targetTime - currentTime
-        newTask.pausedTimerValue = new Date(pausedTimerValueMs < 0 ? 0 : pausedTimerValueMs)
-      } else {
+      if (!targetTask.targetTime) {
         newTask.pausedTimerValue = new Date(currentTime - newTask.timerStartingPoint)
+      } else {
+        const pausedTimerValueMs = newTask.targetTime - currentTime
+        newTask.pausedTimerValue = new Date(pausedTimerValueMs < 1000 ? 0 : pausedTimerValueMs)
       }
 
       return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]

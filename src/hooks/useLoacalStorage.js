@@ -29,7 +29,7 @@ const useLocalStorage = (tasks, setTasks) => {
         const preparedTasks = tasks.map((task) => ({
           ...task,
           creationTime: task.creationTime.getTime(),
-          targetTime: new Date(task.targetTime),
+          targetTime: task.targetTime.getTime(),
           timerStartingPoint: task.timerStartingPoint.getTime(),
           pausedTimerValue: task.pausedTimerValue.getTime(),
         }))
