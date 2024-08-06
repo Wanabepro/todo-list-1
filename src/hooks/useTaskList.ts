@@ -5,13 +5,15 @@ import modifyTaskContent from "../helpers/modifyTaskContent"
 
 import useLocalStorage from "./useLoacalStorage"
 
-const useTaskList = () => {
-  const [tasks, setTasks] = useState([])
+import type { task, tasklist } from "types"
+
+const useTaskList: () => tasklist = () => {
+  const [tasks, setTasks] = useState<task[]>([])
 
   useLocalStorage(tasks, setTasks)
 
-  const addTask = (text, targetTime = null) => {
-    const newTask = {
+  const addTask: tasklist["addTask"] = (text, targetTime = null) => {
+    const newTask: task = {
       text,
       creationTime: new Date(),
       timerStartingPoint: new Date(),
@@ -24,15 +26,15 @@ const useTaskList = () => {
     setTasks((tasks) => [newTask, ...tasks])
   }
 
-  const deleteTask = (creationTime) => {
+  const deleteTask: tasklist["deleteTask"] = (creationTime) => {
     setTasks((tasks) => tasks.filter((task) => task.creationTime !== creationTime))
   }
 
-  const deleteAllCompleted = () => {
+  const deleteAllCompleted: tasklist["deleteAllCompleted"] = () => {
     setTasks((tasks) => tasks.filter((task) => !task.completed))
   }
 
-  const toggleCompleted = (creationTime) => {
+  const toggleCompleted: tasklist["toggleCompleted"] = (creationTime) => {
     setTasks((tasks) => {
       const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
       const newTask = modifyTaskContent(targetTask, { completed: !targetTask.completed })
@@ -41,7 +43,7 @@ const useTaskList = () => {
     })
   }
 
-  const modifyTaskText = (creationTime, newText) => {
+  const modifyTaskText: tasklist["modifyTaskText"] = (creationTime, newText) => {
     setTasks((tasks) => {
       const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
       const newTask = modifyTaskContent(targetTask, { text: newText })
@@ -50,30 +52,34 @@ const useTaskList = () => {
     })
   }
 
-  const startTimer = (creationTime, currentTime) => {
+  const startTimer: tasklist["startTimer"] = (creationTime, currentTime) => {
     setTasks((tasks) => {
       const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
       const newTask = modifyTaskContent(targetTask, { isActive: true })
 
       if (!targetTask.targetTime) {
-        newTask.timerStartingPoint = new Date(currentTime - newTask.pausedTimerValue)
+        newTask.timerStartingPoint = new Date(
+          currentTime.getTime() - targetTask.pausedTimerValue.getTime(),
+        )
       } else if (targetTask.pausedTimerValue.getTime() >= 1000) {
-        newTask.targetTime = new Date(currentTime.getTime() + newTask.pausedTimerValue.getTime())
+        newTask.targetTime = new Date(currentTime.getTime() + targetTask.pausedTimerValue.getTime())
       }
 
       return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
     })
   }
 
-  const stopTimer = (creationTime, currentTime) => {
+  const stopTimer: tasklist["stopTimer"] = (creationTime, currentTime) => {
     setTasks((tasks) => {
       const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
       const newTask = modifyTaskContent(targetTask, { isActive: false })
 
       if (!targetTask.targetTime) {
-        newTask.pausedTimerValue = new Date(currentTime - newTask.timerStartingPoint)
+        newTask.pausedTimerValue = new Date(
+          currentTime.getTime() - targetTask.timerStartingPoint.getTime(),
+        )
       } else {
-        const pausedTimerValueMs = newTask.targetTime - currentTime
+        const pausedTimerValueMs = targetTask.targetTime.getTime() - currentTime.getTime()
         newTask.pausedTimerValue = new Date(pausedTimerValueMs < 1000 ? 0 : pausedTimerValueMs)
       }
 

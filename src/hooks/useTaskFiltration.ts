@@ -1,13 +1,17 @@
 import { useState } from "react"
 
-const filters = {
+import type { task, filters } from "types"
+
+type filterFunction = (tasks: task[]) => task[]
+
+const filters: { [key in filters]: filterFunction } = {
   Active: (tasks) => tasks.filter((task) => !task.completed),
   Completed: (tasks) => tasks.filter((task) => task.completed),
   All: (tasks) => tasks,
 }
 
-const useTaskFiltration = (tasks) => {
-  const [filter, setFilter] = useState("All")
+const useTaskFiltration = (tasks: task[]) => {
+  const [filter, setFilter] = useState<filters>("All")
 
   const filterTasks = () => filters[filter](tasks)
 

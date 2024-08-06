@@ -6,7 +6,7 @@ import Footer from "../footer/footer"
 
 import "./app.css"
 
-function App() {
+const App: React.FC = () => {
   const {
     tasks,
     addTask,

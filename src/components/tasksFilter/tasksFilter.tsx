@@ -2,7 +2,18 @@ import React from "react"
 
 import "./tasksFilter.css"
 
-function TasksFilter({ filter, setFilter }) {
+import type { filters, setState } from "types"
+
+enum filtersEnum {
+  All = "All",
+  Active = "Active",
+  Completed = "Completed",
+}
+
+const TasksFilter: React.FC<{ filter: filters; setFilter: setState<filters> }> = ({
+  filter,
+  setFilter,
+}) => {
   return (
     <ul className="filters">
       <li>
@@ -11,9 +22,9 @@ function TasksFilter({ filter, setFilter }) {
             type="radio"
             name="filter"
             id="all"
-            value="All"
-            checked={filter === "All"}
-            onChange={(e) => setFilter(e.target.value)}
+            value={filtersEnum.All}
+            checked={filter === filtersEnum.All}
+            onChange={(e) => setFilter(e.target.value as filters)}
           />
           All
         </label>
@@ -24,9 +35,9 @@ function TasksFilter({ filter, setFilter }) {
             type="radio"
             name="filter"
             id="active"
-            value="Active"
-            checked={filter === "Active"}
-            onChange={(e) => setFilter(e.target.value)}
+            value={filtersEnum.Active}
+            checked={filter === filtersEnum.Active}
+            onChange={(e) => setFilter(e.target.value as filters)}
           />
           Active
         </label>
@@ -37,9 +48,9 @@ function TasksFilter({ filter, setFilter }) {
             type="radio"
             name="filter"
             id="completed"
-            value="Completed"
-            checked={filter === "Completed"}
-            onChange={(e) => setFilter(e.target.value)}
+            value={filtersEnum.Completed}
+            checked={filter === filtersEnum.Completed}
+            onChange={(e) => setFilter(e.target.value as filters)}
           />
           Completed
         </label>

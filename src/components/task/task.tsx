@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from "react"
 import { formatDistanceToNow } from "date-fns"
 
-import convertSecondsToTimeString from "../../helpers/convertSecondsToTimeString"
+import convertDateToTimeString from "../../helpers/convertDateToTimeString"
+
 import "./task.css"
 
-function Task({
+import type { task, tasklist } from "types"
+
+interface taskProps extends task, Omit<tasklist, "tasks" | "addTask" | "deleteAllCompleted"> {
+  currentTime: Date
+}
+
+const Task: React.FC<taskProps> = ({
   text,
   creationTime,
   timerStartingPoint,
@@ -18,20 +25,20 @@ function Task({
   modifyTaskText,
   startTimer,
   stopTimer,
-}) {
+}) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState(text)
 
-  const inputRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (editing) {
-      inputRef.current.focus()
+      inputRef.current?.focus()
     }
   }, [editing])
 
   useEffect(() => {
-    if (isActive && targetTime && targetTime - currentTime < 0) {
+    if (isActive && targetTime && targetTime.getTime() - currentTime.getTime() < 0) {
       stopTimer(creationTime, currentTime)
     }
   }, [isActive, targetTime, creationTime, currentTime])
@@ -39,22 +46,26 @@ function Task({
   let displayedTimerValue
 
   if (!isActive) {
-    displayedTimerValue = convertSecondsToTimeString(pausedTimerValue)
+    displayedTimerValue = convertDateToTimeString(pausedTimerValue)
   } else if (targetTime) {
     if (currentTime < targetTime) {
-      displayedTimerValue = convertSecondsToTimeString(targetTime - currentTime)
+      displayedTimerValue = convertDateToTimeString(targetTime.getTime() - currentTime.getTime())
     } else {
-      displayedTimerValue = convertSecondsToTimeString(0)
+      displayedTimerValue = convertDateToTimeString(0)
     }
   } else {
-    displayedTimerValue = convertSecondsToTimeString(currentTime - timerStartingPoint)
+    displayedTimerValue = convertDateToTimeString(
+      currentTime.getTime() - timerStartingPoint.getTime(),
+    )
   }
   const isCountdownActive =
-    targetTime && pausedTimerValue.getTime() < 1000 && targetTime - currentTime < 1000
+    !!targetTime &&
+    pausedTimerValue.getTime() < 1000 &&
+    targetTime.getTime() - currentTime.getTime() < 1000
 
   const isStartButtonDisabled = isActive || completed || isCountdownActive
   const isPauseButtonDisabled = !isActive || completed || isCountdownActive
-  const submitHandler = (e) => {
+  const submitHandler: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === "Enter") {
       modifyTaskText(creationTime, inputValue)
       setEditing(false)

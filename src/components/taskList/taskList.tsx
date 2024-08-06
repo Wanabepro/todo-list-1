@@ -3,21 +3,17 @@ import Task from "../task"
 
 import "./taskList.css"
 
+import type { filters, tasklist } from "types"
+
 const emptyTasksMessages = {
   All: "No tasks",
   Active: "No active tasks",
   Completed: "No completed tasks",
 }
 
-function TaskList({
-  tasks,
-  filter,
-  deleteTask,
-  toggleCompleted,
-  modifyTaskText,
-  startTimer,
-  stopTimer,
-}) {
+const TaskList: React.FC<
+  Omit<tasklist, "deleteAllCompleted" | "addTask"> & { filter: filters }
+> = ({ tasks, filter, deleteTask, toggleCompleted, modifyTaskText, startTimer, stopTimer }) => {
   const currentTime = useTimer()
 
   const taskListEmpty = !tasks.length

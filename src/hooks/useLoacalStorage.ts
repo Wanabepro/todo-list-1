@@ -1,7 +1,18 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react"
 
-const useLocalStorage = (tasks, setTasks) => {
+import type { task, setState } from "types"
+
+type notEmptyString = string & { [K in ""]?: never }
+
+interface taskFromLocalStorage
+  extends Omit<task, "creationTime" | "targetTime" | "timerStartingPoint" | "pausedTimerValue"> {
+  creationTime: string
+  targetTime: notEmptyString | null
+  timerStartingPoint: string
+  pausedTimerValue: string
+}
+
+const useLocalStorage = (tasks: task[], setTasks: setState<task[]>) => {
   const tasksRef = useRef(tasks)
 
   useEffect(() => {
@@ -9,13 +20,15 @@ const useLocalStorage = (tasks, setTasks) => {
   }, [tasks])
 
   useEffect(() => {
-    const tasksFromLocalStorage = JSON.parse(localStorage.getItem("tasks"))
+    const tasksFromLocalStorage = localStorage.getItem("tasks")
 
     if (tasksFromLocalStorage) {
-      const preparedTasks = tasksFromLocalStorage.map((task) => ({
+      const tasks: taskFromLocalStorage[] = JSON.parse(tasksFromLocalStorage)
+
+      const preparedTasks: task[] = tasks.map((task) => ({
         ...task,
         creationTime: new Date(task.creationTime),
-        targetTime: new Date(task.targetTime),
+        targetTime: task.targetTime && new Date(task.targetTime),
         timerStartingPoint: new Date(task.timerStartingPoint),
         pausedTimerValue: new Date(task.pausedTimerValue),
       }))
@@ -29,7 +42,7 @@ const useLocalStorage = (tasks, setTasks) => {
         const preparedTasks = tasks.map((task) => ({
           ...task,
           creationTime: task.creationTime.getTime(),
-          targetTime: task.targetTime.getTime(),
+          targetTime: task.targetTime && task.targetTime.getTime(),
           timerStartingPoint: task.timerStartingPoint.getTime(),
           pausedTimerValue: task.pausedTimerValue.getTime(),
         }))

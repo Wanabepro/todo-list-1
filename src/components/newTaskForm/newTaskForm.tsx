@@ -3,11 +3,13 @@ import React, { useState } from "react"
 import "./newTaskForm.css"
 import calculateTargetTime from "../../helpers/calcuclateTargetTime"
 
-function NewTaskForm({ addTask }) {
+import type { tasklist } from "types"
+
+const NewTaskForm: React.FC<{ addTask: tasklist["addTask"] }> = ({ addTask }) => {
   const [text, setText] = useState("")
   const [time, setTime] = useState({ minutes: "", seconds: "" })
 
-  const changeHandler = (e) => {
+  const changeHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target
 
     if (name === "minutes" || name === "seconds") {
@@ -19,12 +21,18 @@ function NewTaskForm({ addTask }) {
     }
   }
 
-  const keyDownHandler = (e) => {
+  const keyDownHandler: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === "Enter") {
       const { minutes, seconds } = time
 
-      if (text && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
-        addTask(text, calculateTargetTime(minutes, seconds))
+      if (
+        text &&
+        Number(minutes) >= 0 &&
+        Number(minutes) < 60 &&
+        Number(seconds) >= 0 &&
+        Number(seconds) < 60
+      ) {
+        addTask(text, calculateTargetTime(Number(minutes), Number(seconds)))
 
         setText("")
         setTime({ minutes: "", seconds: "" })
@@ -34,13 +42,13 @@ function NewTaskForm({ addTask }) {
     if (e.key === "Escape") {
       setText("")
       setTime({ minutes: "", seconds: "" })
-      e.target.blur()
+      ;(e.target as HTMLInputElement).blur()
     }
   }
 
-  const timeIsInvalid = (type) => {
+  const timeIsInvalid = (type: "minutes" | "seconds") => {
     const { [type]: value } = time
-    return value > 59
+    return Number(value) > 59
   }
 
   return (
