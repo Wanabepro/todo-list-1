@@ -1,10 +1,6 @@
 import { format } from "date-fns"
 
-function convertDateToTimeString(seconds: number | Date) {
-  let time = seconds
-  if (typeof time !== "number") {
-    time = time.getTime()
-  }
+function convertDateToTimeString(time: number) {
   if (time < 1000) return "00:00"
 
   if (time < 60 * 60 * 1000) {

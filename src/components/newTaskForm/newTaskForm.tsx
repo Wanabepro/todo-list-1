@@ -7,12 +7,12 @@ import type { tasklist } from "types"
 
 const NewTaskForm: React.FC<{ addTask: tasklist["addTask"] }> = ({ addTask }) => {
   const [text, setText] = useState("")
-  const [time, setTime] = useState({ minutes: "", seconds: "" })
+  const [time, setTime] = useState({ m: "", s: "" })
 
   const changeHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target
 
-    if (name === "minutes" || name === "seconds") {
+    if (name === "m" || name === "s") {
       if (!Number.isNaN(Number(value))) {
         setTime((time) => ({ ...time, [name]: value }))
       }
@@ -23,30 +23,26 @@ const NewTaskForm: React.FC<{ addTask: tasklist["addTask"] }> = ({ addTask }) =>
 
   const keyDownHandler: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === "Enter") {
-      const { minutes, seconds } = time
+      const { m, s } = time
+      const minutes = Number(m)
+      const seconds = Number(s)
 
-      if (
-        text &&
-        Number(minutes) >= 0 &&
-        Number(minutes) < 60 &&
-        Number(seconds) >= 0 &&
-        Number(seconds) < 60
-      ) {
-        addTask(text, calculateTargetTime(Number(minutes), Number(seconds)))
+      if (text && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
+        addTask(text, calculateTargetTime(minutes, seconds))
 
         setText("")
-        setTime({ minutes: "", seconds: "" })
+        setTime({ m: "", s: "" })
       }
     }
 
     if (e.key === "Escape") {
       setText("")
-      setTime({ minutes: "", seconds: "" })
+      setTime({ m: "", s: "" })
       ;(e.target as HTMLInputElement).blur()
     }
   }
 
-  const timeIsInvalid = (type: "minutes" | "seconds") => {
+  const timeIsInvalid = (type: "m" | "s") => {
     const { [type]: value } = time
     return Number(value) > 59
   }
@@ -63,18 +59,18 @@ const NewTaskForm: React.FC<{ addTask: tasklist["addTask"] }> = ({ addTask }) =>
         onKeyDown={keyDownHandler}
       />
       <input
-        name="minutes"
-        className={`new-todo-form__timer${timeIsInvalid("minutes") ? " invalid" : ""}`}
+        name="m"
+        className={`new-todo-form__timer${timeIsInvalid("m") ? " invalid" : ""}`}
         placeholder="Min"
-        value={time.minutes}
+        value={time.m}
         onChange={changeHandler}
         onKeyDown={keyDownHandler}
       />
       <input
-        name="seconds"
-        className={`new-todo-form__timer${timeIsInvalid("seconds") ? " invalid" : ""}`}
+        name="s"
+        className={`new-todo-form__timer${timeIsInvalid("s") ? " invalid" : ""}`}
         placeholder="Sec"
-        value={time.seconds}
+        value={time.s}
         onChange={changeHandler}
         onKeyDown={keyDownHandler}
       />

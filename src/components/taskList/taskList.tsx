@@ -16,7 +16,7 @@ const TaskList: React.FC<
 > = ({ tasks, filter, deleteTask, toggleCompleted, modifyTaskText, startTimer, stopTimer }) => {
   const currentTime = useTimer()
 
-  const taskListEmpty = !tasks.length
+  const taskListEmpty = !tasks.size
 
   if (taskListEmpty) {
     return <div className="message">{emptyTasksMessages[filter]}</div>
@@ -24,9 +24,10 @@ const TaskList: React.FC<
 
   return (
     <ul className="todo-list">
-      {tasks.map((task) => {
+      {Array.from(tasks.entries()).map(([creationTime, task]) => {
         const taskAttributes = {
           ...task,
+          creationTime,
           deleteTask,
           toggleCompleted,
           modifyTaskText,
@@ -36,7 +37,7 @@ const TaskList: React.FC<
         }
 
         return (
-          <li key={task.creationTime.getTime()} className={task.completed ? "completed" : ""}>
+          <li key={creationTime} className={task.completed ? "completed" : ""}>
             <Task {...taskAttributes} />
           </li>
         )

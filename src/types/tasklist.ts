@@ -1,14 +1,14 @@
 import task from "./task"
 
-type timerOperatingFunction = (creationTime: task["creationTime"], currentTime: Date) => void
+type timerOperatingFunction = (creationTime: number, currentTime: number) => void
 
 export default interface tasklist {
-  tasks: task[]
+  tasks: Map<number, task>
   addTask: (text: task["text"], targetTime: task["targetTime"]) => void
-  deleteTask: (creationTime: task["creationTime"]) => void
+  deleteTask: (creationTime: number) => void
   deleteAllCompleted: () => void
-  toggleCompleted: (creationTime: task["creationTime"]) => void
+  toggleCompleted: (creationTime: number) => void
   startTimer: timerOperatingFunction
   stopTimer: timerOperatingFunction
-  modifyTaskText: (creationTime: task["creationTime"], newText: task["text"]) => void
+  modifyTaskText: (creationTime: number, newText: task["text"]) => void
 }

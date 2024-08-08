@@ -1,6 +1,5 @@
 import { useState } from "react"
 
-import findTaskByCreationTime from "../helpers/findTaskByCreationTime"
 import modifyTaskContent from "../helpers/modifyTaskContent"
 
 import useLocalStorage from "./useLoacalStorage"
@@ -8,82 +7,126 @@ import useLocalStorage from "./useLoacalStorage"
 import type { task, tasklist } from "types"
 
 const useTaskList: () => tasklist = () => {
-  const [tasks, setTasks] = useState<task[]>([])
+  const [tasks, setTasks] = useState<Map<number, task>>(new Map())
 
   useLocalStorage(tasks, setTasks)
 
   const addTask: tasklist["addTask"] = (text, targetTime = null) => {
     const newTask: task = {
       text,
-      creationTime: new Date(),
-      timerStartingPoint: new Date(),
-      pausedTimerValue: new Date(0),
+      timerStartingPoint: new Date().getTime(),
+      pausedTimerValue: new Date(0).getTime(),
       targetTime,
       completed: false,
       isActive: true,
     }
 
-    setTasks((tasks) => [newTask, ...tasks])
+    const creationTime = new Date().getTime()
+
+    setTasks((tasks) => {
+      const copy = structuredClone(tasks)
+      copy.set(creationTime, newTask)
+
+      return copy
+    })
   }
 
   const deleteTask: tasklist["deleteTask"] = (creationTime) => {
-    setTasks((tasks) => tasks.filter((task) => task.creationTime !== creationTime))
+    setTasks((tasks) => {
+      const copy = structuredClone(tasks)
+
+      if (copy.has(creationTime)) {
+        copy.delete(creationTime)
+      }
+
+      return copy
+    })
   }
 
   const deleteAllCompleted: tasklist["deleteAllCompleted"] = () => {
-    setTasks((tasks) => tasks.filter((task) => !task.completed))
+    setTasks((tasks) => {
+      const copy = structuredClone(tasks)
+
+      copy.forEach((task, creationTime) => {
+        if (task.completed) {
+          copy.delete(creationTime)
+        }
+      })
+
+      return copy
+    })
   }
 
   const toggleCompleted: tasklist["toggleCompleted"] = (creationTime) => {
     setTasks((tasks) => {
-      const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
-      const newTask = modifyTaskContent(targetTask, { completed: !targetTask.completed })
+      const copy = structuredClone(tasks)
 
-      return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
+      const targetTask = copy.get(creationTime)
+
+      if (targetTask) {
+        copy.set(creationTime, modifyTaskContent(targetTask, { completed: !targetTask.completed }))
+      }
+
+      return copy
     })
   }
 
   const modifyTaskText: tasklist["modifyTaskText"] = (creationTime, newText) => {
     setTasks((tasks) => {
-      const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
-      const newTask = modifyTaskContent(targetTask, { text: newText })
+      const copy = structuredClone(tasks)
 
-      return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
+      const targetTask = copy.get(creationTime)
+
+      if (targetTask) {
+        copy.set(creationTime, modifyTaskContent(targetTask, { text: newText }))
+      }
+
+      return copy
     })
   }
 
   const startTimer: tasklist["startTimer"] = (creationTime, currentTime) => {
     setTasks((tasks) => {
-      const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
-      const newTask = modifyTaskContent(targetTask, { isActive: true })
+      const copy = structuredClone(tasks)
 
-      if (!targetTask.targetTime) {
-        newTask.timerStartingPoint = new Date(
-          currentTime.getTime() - targetTask.pausedTimerValue.getTime(),
-        )
-      } else if (targetTask.pausedTimerValue.getTime() >= 1000) {
-        newTask.targetTime = new Date(currentTime.getTime() + targetTask.pausedTimerValue.getTime())
+      const targetTask = copy.get(creationTime)
+
+      if (targetTask) {
+        const newTask = modifyTaskContent(targetTask, { isActive: true })
+
+        if (!targetTask.targetTime) {
+          newTask.timerStartingPoint = currentTime - targetTask.pausedTimerValue
+        } else if (targetTask.pausedTimerValue >= 1000) {
+          newTask.targetTime = currentTime + targetTask.pausedTimerValue
+        }
+
+        copy.set(creationTime, newTask)
       }
 
-      return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
+      return copy
     })
   }
 
   const stopTimer: tasklist["stopTimer"] = (creationTime, currentTime) => {
     setTasks((tasks) => {
-      const [targetIndex, targetTask] = findTaskByCreationTime(creationTime, tasks)
-      const newTask = modifyTaskContent(targetTask, { isActive: false })
+      const copy = structuredClone(tasks)
 
-      if (!targetTask.targetTime) {
-        newTask.pausedTimerValue = new Date(
-          currentTime.getTime() - targetTask.timerStartingPoint.getTime(),
-        )
-      } else {
-        const pausedTimerValueMs = targetTask.targetTime.getTime() - currentTime.getTime()
-        newTask.pausedTimerValue = new Date(pausedTimerValueMs < 1000 ? 0 : pausedTimerValueMs)
+      const targetTask = copy.get(creationTime)
+
+      if (targetTask) {
+        const newTask = modifyTaskContent(targetTask, { isActive: false })
+
+        if (!targetTask.targetTime) {
+          newTask.pausedTimerValue = currentTime - targetTask.timerStartingPoint
+        } else {
+          const pausedTimerValueMs = targetTask.targetTime - currentTime
+          newTask.pausedTimerValue = pausedTimerValueMs < 1000 ? 0 : pausedTimerValueMs
+        }
+
+        copy.set(creationTime, newTask)
       }
 
-      return [...tasks.slice(0, targetIndex), newTask, ...tasks.slice(targetIndex + 1)]
+      return copy
     })
   }
 

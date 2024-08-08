@@ -2,17 +2,7 @@ import { useEffect, useRef } from "react"
 
 import type { task, setState } from "types"
 
-type notEmptyString = string & { [K in ""]?: never }
-
-interface taskFromLocalStorage
-  extends Omit<task, "creationTime" | "targetTime" | "timerStartingPoint" | "pausedTimerValue"> {
-  creationTime: string
-  targetTime: notEmptyString | null
-  timerStartingPoint: string
-  pausedTimerValue: string
-}
-
-const useLocalStorage = (tasks: task[], setTasks: setState<task[]>) => {
+const useLocalStorage = (tasks: Map<number, task>, setTasks: setState<Map<number, task>>) => {
   const tasksRef = useRef(tasks)
 
   useEffect(() => {
@@ -23,29 +13,18 @@ const useLocalStorage = (tasks: task[], setTasks: setState<task[]>) => {
     const tasksFromLocalStorage = localStorage.getItem("tasks")
 
     if (tasksFromLocalStorage) {
-      const tasks: taskFromLocalStorage[] = JSON.parse(tasksFromLocalStorage)
+      const tasks: [number, task][] = JSON.parse(tasksFromLocalStorage)
 
-      const preparedTasks: task[] = tasks.map((task) => ({
-        ...task,
-        creationTime: new Date(task.creationTime),
-        targetTime: task.targetTime && new Date(task.targetTime),
-        timerStartingPoint: new Date(task.timerStartingPoint),
-        pausedTimerValue: new Date(task.pausedTimerValue),
-      }))
+      const preparedTasks: Map<number, task> = new Map(tasks)
 
       setTasks(preparedTasks)
     }
 
     const saveData = () => {
       const tasks = tasksRef.current
-      if (tasks.length) {
-        const preparedTasks = tasks.map((task) => ({
-          ...task,
-          creationTime: task.creationTime.getTime(),
-          targetTime: task.targetTime && task.targetTime.getTime(),
-          timerStartingPoint: task.timerStartingPoint.getTime(),
-          pausedTimerValue: task.pausedTimerValue.getTime(),
-        }))
+
+      if (tasks.size) {
+        const preparedTasks = Array.from(tasks.entries())
 
         localStorage.setItem("tasks", JSON.stringify(preparedTasks))
       } else {

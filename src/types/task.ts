@@ -1,9 +1,8 @@
 export default interface task {
   text: string
-  creationTime: Date
-  timerStartingPoint: Date
-  pausedTimerValue: Date
-  targetTime: Date | null
+  timerStartingPoint: number
+  pausedTimerValue: number
+  targetTime: number | null
   completed: boolean
   isActive: boolean
 }

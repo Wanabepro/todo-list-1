@@ -8,7 +8,8 @@ import "./task.css"
 import type { task, tasklist } from "types"
 
 interface taskProps extends task, Omit<tasklist, "tasks" | "addTask" | "deleteAllCompleted"> {
-  currentTime: Date
+  creationTime: number
+  currentTime: number
 }
 
 const Task: React.FC<taskProps> = ({
@@ -38,7 +39,7 @@ const Task: React.FC<taskProps> = ({
   }, [editing])
 
   useEffect(() => {
-    if (isActive && targetTime && targetTime.getTime() - currentTime.getTime() < 0) {
+    if (isActive && targetTime && targetTime - currentTime < 0) {
       stopTimer(creationTime, currentTime)
     }
   }, [isActive, targetTime, creationTime, currentTime])
@@ -49,19 +50,15 @@ const Task: React.FC<taskProps> = ({
     displayedTimerValue = convertDateToTimeString(pausedTimerValue)
   } else if (targetTime) {
     if (currentTime < targetTime) {
-      displayedTimerValue = convertDateToTimeString(targetTime.getTime() - currentTime.getTime())
+      displayedTimerValue = convertDateToTimeString(targetTime - currentTime)
     } else {
       displayedTimerValue = convertDateToTimeString(0)
     }
   } else {
-    displayedTimerValue = convertDateToTimeString(
-      currentTime.getTime() - timerStartingPoint.getTime(),
-    )
+    displayedTimerValue = convertDateToTimeString(currentTime - timerStartingPoint)
   }
   const isCountdownActive =
-    !!targetTime &&
-    pausedTimerValue.getTime() < 1000 &&
-    targetTime.getTime() - currentTime.getTime() < 1000
+    !!targetTime && pausedTimerValue < 1000 && targetTime - currentTime < 1000
 
   const isStartButtonDisabled = isActive || completed || isCountdownActive
   const isPauseButtonDisabled = !isActive || completed || isCountdownActive
@@ -104,7 +101,7 @@ const Task: React.FC<taskProps> = ({
   return (
     <div className="view">
       <input
-        id={`toggle${creationTime.getTime()}`}
+        id={`toggle${creationTime}`}
         className="toggle"
         type="checkbox"
         onChange={() => {
@@ -112,7 +109,7 @@ const Task: React.FC<taskProps> = ({
         }}
         checked={completed}
       />
-      <label htmlFor={`toggle${creationTime.getTime()}`}>
+      <label htmlFor={`toggle${creationTime}`}>
         <span className="title">{text}</span>
         <span className="description">
           <button
