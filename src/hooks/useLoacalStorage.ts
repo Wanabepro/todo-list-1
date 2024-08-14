@@ -1,14 +1,8 @@
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 
 import type { task, setState } from "types"
 
 const useLocalStorage = (tasks: Map<number, task>, setTasks: setState<Map<number, task>>) => {
-  const tasksRef = useRef(tasks)
-
-  useEffect(() => {
-    tasksRef.current = tasks
-  }, [tasks])
-
   useEffect(() => {
     const tasksFromLocalStorage = localStorage.getItem("tasks")
 
@@ -19,10 +13,10 @@ const useLocalStorage = (tasks: Map<number, task>, setTasks: setState<Map<number
 
       setTasks(preparedTasks)
     }
+  }, [])
 
+  useEffect(() => {
     const saveData = () => {
-      const tasks = tasksRef.current
-
       if (tasks.size) {
         const preparedTasks = Array.from(tasks.entries())
 
@@ -30,17 +24,14 @@ const useLocalStorage = (tasks: Map<number, task>, setTasks: setState<Map<number
       } else {
         localStorage.removeItem("tasks")
       }
-
-      return tasks
     }
 
     window.addEventListener("beforeunload", saveData)
 
     return () => {
       window.removeEventListener("beforeunload", saveData)
-      saveData()
     }
-  }, [])
+  }, [tasks])
 }
 
 export default useLocalStorage

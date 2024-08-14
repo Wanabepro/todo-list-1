@@ -24,7 +24,7 @@ const useTaskList: () => tasklist = () => {
     const creationTime = new Date().getTime()
 
     setTasks((tasks) => {
-      const copy = structuredClone(tasks)
+      const copy = new Map(tasks)
       copy.set(creationTime, newTask)
 
       return copy
@@ -33,7 +33,7 @@ const useTaskList: () => tasklist = () => {
 
   const deleteTask: tasklist["deleteTask"] = (creationTime) => {
     setTasks((tasks) => {
-      const copy = structuredClone(tasks)
+      const copy = new Map(tasks)
 
       if (copy.has(creationTime)) {
         copy.delete(creationTime)
@@ -45,7 +45,7 @@ const useTaskList: () => tasklist = () => {
 
   const deleteAllCompleted: tasklist["deleteAllCompleted"] = () => {
     setTasks((tasks) => {
-      const copy = structuredClone(tasks)
+      const copy = new Map(tasks)
 
       copy.forEach((task, creationTime) => {
         if (task.completed) {
@@ -59,7 +59,7 @@ const useTaskList: () => tasklist = () => {
 
   const toggleCompleted: tasklist["toggleCompleted"] = (creationTime) => {
     setTasks((tasks) => {
-      const copy = structuredClone(tasks)
+      const copy = new Map(tasks)
 
       const targetTask = copy.get(creationTime)
 
@@ -73,7 +73,7 @@ const useTaskList: () => tasklist = () => {
 
   const modifyTaskText: tasklist["modifyTaskText"] = (creationTime, newText) => {
     setTasks((tasks) => {
-      const copy = structuredClone(tasks)
+      const copy = new Map(tasks)
 
       const targetTask = copy.get(creationTime)
 
@@ -87,7 +87,7 @@ const useTaskList: () => tasklist = () => {
 
   const startTimer: tasklist["startTimer"] = (creationTime, currentTime) => {
     setTasks((tasks) => {
-      const copy = structuredClone(tasks)
+      const copy = new Map(tasks)
 
       const targetTask = copy.get(creationTime)
 
@@ -109,7 +109,7 @@ const useTaskList: () => tasklist = () => {
 
   const stopTimer: tasklist["stopTimer"] = (creationTime, currentTime) => {
     setTasks((tasks) => {
-      const copy = structuredClone(tasks)
+      const copy = new Map(tasks)
 
       const targetTask = copy.get(creationTime)
 
